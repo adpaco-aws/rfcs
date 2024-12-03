@@ -1,0 +1,353 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>0070-disallow-empty-namespace-shadowing - Cedar RFC Book</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Cedar RFC Book</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="disallow-shadowing-definitions-in-the-empty-namespace"><a class="header" href="#disallow-shadowing-definitions-in-the-empty-namespace">Disallow shadowing definitions in the empty namespace</a></h1>
+<h2 id="related-issues-and-prs"><a class="header" href="#related-issues-and-prs">Related issues and PRs</a></h2>
+<ul>
+<li>Reference Issues: Successor to <a href="https://github.com/cedar-policy/rfcs/pull/64">RFC 64</a></li>
+<li>Implementation PR(s):</li>
+</ul>
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li>Started: 2024-06-26</li>
+<li>Accepted: 2024-08-01</li>
+<li>Landed: 2024-08-26 on <code>main</code> (<a href="https://github.com/cedar-policy/cedar/pull/1147">#1147</a>)</li>
+<li>Released: TBD</li>
+</ul>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>In schemas, disallow definitions of entity types, common types, and actions that
+would shadow definitions of other entity types, common types, or actions in the
+empty namespace.</p>
+<h2 id="basic-example"><a class="header" href="#basic-example">Basic example</a></h2>
+<p>Borrowing and slightly tweaking the example from <a href="https://github.com/cedar-policy/rfcs/pull/64">RFC 64</a>:</p>
+<pre><code>entity User {
+    email: String,
+};
+
+namespace Demo {
+    entity User {
+        id: String,
+    };
+
+    entity Account {
+        owner: User,
+    };
+}
+</code></pre>
+<p>Today, this schema is accepted, and <code>Account.owner</code> is assumed to be
+<code>Demo::User</code> and not the empty-namespace <code>User</code>.
+As noted in <a href="https://github.com/cedar-policy/rfcs/pull/64">RFC 64</a>, there is no way for the user to indicate that they intend
+<code>Account.owner</code> to be the empty-namespace <code>User</code>.
+Rather than add syntax to enable this (as proposed in <a href="https://github.com/cedar-policy/rfcs/pull/64">RFC 64</a>), this RFC
+proposes to make this situation an error -- disallowing declaring a <code>User</code> type
+in the <code>Demo</code> namespace when one already exists in the empty namespace.</p>
+<h2 id="motivation"><a class="header" href="#motivation">Motivation</a></h2>
+<p>Name shadowing is complicated and confusing; schemas using name shadowing may
+look like they are doing one thing when they are actually doing another.
+For Cedar policy and schema authors, this can cause misunderstandings and make
+it more difficult to write correct schemas and policies.
+By disallowing shadowing in the most egregiously ambiguous cases -- when the
+name being shadowed was declared in the empty namespace -- we nudge users to
+make the schema clearer, for instance by renaming a type, or moving a
+conflicting empty-namespace declaration into a new namespace.</p>
+<h2 id="detailed-design"><a class="header" href="#detailed-design">Detailed design</a></h2>
+<p>We disallow shadowing a type or action in the empty namespace with a new
+declaration in a nonempty namespace.</p>
+<ul>
+<li>For entity and common types, we disallow this shadowing regardless of whether
+the shadowed declaration is an entity or common type, and regardless of whether
+the shadowing declaration is an entity or common type.</li>
+<li>For actions, we only disallow shadowing other actions.
+We continue to allow an action to have the same name as an entity or common
+type (in the same namespace or in the empty namespace).
+That is not "shadowing", as there is no place in a schema where it's ambiguous
+whether you're referring to an action or an entity/common type.</li>
+</ul>
+<p>This RFC does not disallow shadowing altogether; in particular, it does not
+disallow shadowing a entity typename with a common typename in the same namespace,
+as originally proposed in <a href="https://github.com/cedar-policy/rfcs/blob/main/text/0024-schema-syntax.md">RFC 24</a> (see "Disambiguating Types in Custom Syntax",
+and in particular Rule 5 in that section):</p>
+<pre><code>// Allowed today, and still allowed after this RFC
+namespace NS {
+    entity User {
+        id: String,
+    }
+    type User = User;
+    // or, more confusingly, type User = String;
+}
+</code></pre>
+<p>This RFC also does not disallow shadowing the names of primitive or extension
+types, where you can still refer to the shadowed type using <code>__cedar</code>, again as
+explained in <a href="https://github.com/cedar-policy/rfcs/blob/main/text/0024-schema-syntax.md">RFC 24</a>.
+Conceptually, primitive and extension types are not declared in the empty
+namespace; they are declared in the <code>__cedar</code> namespace, and implicitly imported
+as part of a prelude.
+That is how we could explain (e.g. in the Cedar docs) why the rule is different
+for shadowing entity/common types and shadowing primitive/extension types.
+(Internally, another reason for continuing to allow shadowing
+primitive/extension types, is that we want to be able to introduce new extension
+types without any possibility of breaking existing schemas.)</p>
+<p>This RFC does not change anything about <a href="https://github.com/cedar-policy/cedar/issues/579">cedar#579</a>.
+We still plan to implement <a href="https://github.com/cedar-policy/cedar/issues/579">cedar#579</a>, which allows users to refer to types in
+the empty namespace, in cases where they are not shadowed.</p>
+<p>This RFC does apply the new restriction uniformly in both the human and JSON
+schema syntaxes.
+The motivation and situation is the same in both syntaxes for the case of an
+entity typename shadowing an entity typename, and for the case of a common
+typename shadowing a common typename.
+For the case of an entity typename shadowing a common typename or vice versa,
+this RFC still proposes to disallow in both syntaxes, even though these
+situations are not ambiguous in the JSON syntax, which distinguishes between
+entity type and common type references.
+See <a href="https://github.com/cedar-policy/rfcs/pull/70#discussion_r1659120108">this RFC discussion thread</a>.</p>
+<h2 id="drawbacks"><a class="header" href="#drawbacks">Drawbacks</a></h2>
+<h3 id="drawback-1"><a class="header" href="#drawback-1">Drawback 1</a></h3>
+<p>The motivation section for <a href="https://github.com/cedar-policy/rfcs/pull/64">RFC 64</a> claimed that</p>
+<blockquote>
+<p>Users justifiably expect that they can refer to any declared typename (in any
+namespace) from any position in the schema, by writing a fully qualified name.
+The fact that <a href="https://github.com/cedar-policy/rfcs/blob/main/text/0024-schema-syntax.md">RFC 24</a> did not provide a way to refer to typenames in the empty
+namespace by using some kind of fully qualified name seems like an oversight,
+and should be corrected for consistency.</p>
+</blockquote>
+<p>This RFC does not address that motivation, and effectively counterclaims that
+users don't actually expect this.</p>
+<h3 id="drawback-2"><a class="header" href="#drawback-2">Drawback 2</a></h3>
+<p>If <a href="https://github.com/cedar-policy/rfcs/pull/69">RFC 69</a> or something similar are eventually accepted, the error in this RFC
+may not be so easily avoided, if the empty-namespace definition is part of a
+third-party library being imported by the user.
+In that case, the user couldn't easily rename the empty-namespace type or move
+it into a nonempty namespace.</p>
+<p>To address this drawback, we should guide library authors to not declare library
+types or actions in the empty namespace (and instead, e.g., declare them in a
+namespace named after the library).
+We could even codify that rule, requiring that all libraries have a name and all
+declarations in the library live in the corresponding namespace, or alternately,
+implicitly prefixing all library declarations with the library name as a
+toplevel namespace.
+Many existing package systems have similar rules or mechanisms.</p>
+<h2 id="alternatives"><a class="header" href="#alternatives">Alternatives</a></h2>
+<p><a href="https://github.com/cedar-policy/rfcs/pull/64">RFC 64</a> proposed instead introducing new schema syntax to allow users to refer
+to entity and common types in the empty namespace whose names are shadowed by
+declarations in the current namespace.
+(RFC 64 could be naturally extended to actions as well.)</p>
+<p>Introducing new schema syntax is a major change, and in the discussion on
+<a href="https://github.com/cedar-policy/rfcs/pull/64">RFC 64</a> we have been, to date as of this writing, unable to agree on a syntax for
+this which is clear and acceptable to everyone.
+On the RFC thread and in offline discussions, the leading candidates for such a
+syntax are currently (as of this writing) <code>::User</code>, <code>root User</code>, or
+<code>__cedar::Root::User</code> (reusing the <code>__cedar</code> namespace reserved in <a href="https://github.com/cedar-policy/rfcs/blob/main/text/0052-reserved-namespaces.md">RFC 52</a>).
+But it seems apparent that none of these options are immediately intuitive to
+all users; if we were to introduce such a syntax, we run the risk of
+complicating the schema syntax only to not actually clarify the situation
+because the new syntax is still unclear.</p>
+<p>Finally, this shadowing situation is viewed as an unlikely edge case in general,
+and certainly one that can easily be avoided by users (by renaming types/actions
+or moving empty-namespace declarations into a namespace).
+It seems expedient to resolve this in the easiest, clearest way possible.
+This RFC proposes that disallowing the premise is easier and clearer than
+designing and implementing new schema syntax that will only be used in an
+unlikely edge case.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="0068-entity-tags.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="0071-trailing-commas.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="0068-entity-tags.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="0071-trailing-commas.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

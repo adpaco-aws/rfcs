@@ -1,0 +1,423 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>0048-schema-annotations - Cedar RFC Book</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Cedar RFC Book</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="annotations-for-cedar-schemas"><a class="header" href="#annotations-for-cedar-schemas">Annotations for Cedar Schemas</a></h1>
+<h2 id="related-issues-and-prs"><a class="header" href="#related-issues-and-prs">Related issues and PRs</a></h2>
+<ul>
+<li>Reference Issues:</li>
+<li>Implementation PR(s): https://github.com/cedar-policy/cedar/tree/feature/shaobo/rfc48</li>
+</ul>
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li>Started: 2024-02-05</li>
+</ul>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>Like Cedar policies, users may want to associate arbitrary, machine readable metadata with Schema objects.
+We solved this problem in Cedar policies by allowing for <em>annotations</em>: arbitrary key/value pairs that are attachable to policies.
+This could be extended to Cedar schemas, allowing users to attach attributes an entity type/common type/action declaration and attribute declaration.</p>
+<h2 id="basic-example"><a class="header" href="#basic-example">Basic example</a></h2>
+<p>Here is a basic example for doc comments.</p>
+<pre><code>@doc("this is the namespace")
+namespace TinyTodo {
+    @doc("a common type representing a task")
+    type Task = {
+        @doc("task id")
+        "id": Long,
+        "name": String,
+        "state": String,
+    };
+    @doc("a common type representing a set of tasks")
+    type Tasks = Set&lt;Task&gt;;
+
+    @doc("an entity type representing a list")
+    @docComment("any entity type is a child of type `Application`")
+    entity List in [Application] = {
+        @doc("editors of a list")
+        "editors": Team,
+        "name": String,
+        "owner": User,
+        @doc("readers of a list")
+        "readers": Team,
+        "tasks": Tasks,
+    };
+
+    @doc("actions that a user can operate on a list")
+    action DeleteList, GetList, UpdateList appliesTo {
+        principal: [User],
+        resource: [List]
+    };
+}
+</code></pre>
+<p>The <code>@id("...")</code> notation is similar to the notation used for policy annotations.</p>
+<h2 id="motivation"><a class="header" href="#motivation">Motivation</a></h2>
+<p>Users should be allowed to associate machine readable metadata with objects in a Schema.
+While we could create special syntax for associating particular kinds of metadata, we cannot
+predict all of the metadata uses that users will have.
+Thus providing a flexible system that users can adapt to their needs is preferable.
+This proposal re-uses the same syntax from Cedar Policies, creating a unified syntax.</p>
+<h2 id="detailed-design"><a class="header" href="#detailed-design">Detailed design</a></h2>
+<h3 id="semantics"><a class="header" href="#semantics">Semantics</a></h3>
+<p>Attributes have <strong>no</strong> impact on validation decisions.
+Attributes are arbitrary key/value pairs where:</p>
+<ul>
+<li>'key' is a valid Cedar identifier</li>
+<li>'value' is a Cedar string</li>
+</ul>
+<p>The Cedar spec takes no opinion or stance on the interpretation of annotations.
+The interpretation is entirely up to users of Cedar.</p>
+<h3 id="cedar-schema-syntax"><a class="header" href="#cedar-schema-syntax">Cedar Schema Syntax</a></h3>
+<p>Attributes in Cedar Schemas will mirror the syntax used for attributes in a policy: informally that's <code>@&lt;key&gt;("value")</code>.
+Formally the following rule is added to the Cedar grammar:</p>
+<pre><code>Annotation := '@' IDENT '(' STR ')'
+Annotations := {Annotations}
+</code></pre>
+<p>With an arbitrary number of them being able to prepend to a namespace declaration, entity type declaration, common type declaration, action declaration, and an attribute declaration.</p>
+<p>Thus the full schema syntax becomes:</p>
+<pre><code>Schema      := {Namespace}
+Namespace   := (Annotations 'namespace' Path '{' {Decl} '}') | {Decl}
+Decl        := Entity | Action | TypeDecl
+Entity      := Annotations 'entity' Idents ['in' EntOrTyps] [['='] RecType] ';'
+Action      := Annotations 'action' Names ['in' (Name | '[' [Names] ']')] [AppliesTo] [ActAttrs]';'
+TypeDecl    := Annotations 'type' IDENT '=' Type ';'
+Type        := PRIMTYPE | IDENT | SetType | RecType
+EntType     := Path
+SetType     := 'Set' '&lt;' Type '&gt;'
+RecType     := '{' [AttrDecls] '}'
+AttrDecls   := Annotations Name ['?'] ':' Type [',' | ',' AttrDecls]
+AppliesTo   := 'appliesTo' '{' AppDecls '}'
+ActAttrs    := 'attributes' '{' AttrDecls '}'
+AppDecls    := ('principal' | 'resource') ':' EntOrTyps [',' | ',' AppDecls]
+             | 'context' ':' RecType [',' | ',' AppDecls]
+Path        := IDENT {'::' IDENT}
+EntTypes    := Path {',' Path}
+EntOrTyps   := EntType | '[' [EntTypes] ']'
+Name        := IDENT | STR
+Names       := Name {',' Name}
+Idents      := IDENT {',' IDENT}
+Annotation  := '@' IDENT '(' STR ')
+Annotations := Annotation {Annotations}
+
+IDENT       := ['_''a'-'z''A'-'Z']['_''a'-'z''A'-'Z''0'-'9']* - PRIMTYPE
+STR         := Fully-escaped Unicode surrounded by '"'s
+PRIMTYPE    := 'Long' | 'String' | 'Bool'
+WHITESPC    := Unicode whitespace
+COMMENT     := '//' ~NEWLINE* NEWLINE
+</code></pre>
+<h3 id="json-syntax"><a class="header" href="#json-syntax">JSON Syntax</a></h3>
+<p>None of the three top-level constructs (EntityTypes, Actions, CommonTypes) in JSON schemas allow for arbitrary key/value pairs.
+This means a new key can be safely added while preserving backwards compatibility.
+The same fact also applies to entity attribute declarations.
+This proposal reserves the <code>annotations</code> key at the top level of each of those constructs, which contains an Object, containing each annotation key as an Object key, associated with the annotation string.
+The only oddness here is Common Types, whose toplevel is a regular type. While this should still be backwards compatible, it will look a little odd to have annotations in some types and not in others.</p>
+<p>A corresponding JSON schema for the above example is as follows.</p>
+<pre><code class="language-JSON">{
+    "": {
+    "annotations": {
+        "doc": "this is the namespace"
+    },
+    "commonTypes": {
+        "Task": {
+        "annotations": {
+            "doc": "a common type representing a task"
+        },
+        "type": "Record",
+        "attributes": {
+            "id": {
+            "type": "Long",
+            "annotations": {
+                "doc": "task id"
+            },
+            },
+            "name": {
+            "type": "String"
+            },
+            "state": {
+            "type": "String"
+            }
+        }
+        },
+        "Tasks": {
+        "type": "Set",
+        "element": {
+            "type": "Task"
+        }
+        }
+    },
+    "entityTypes": {
+        "Application": {},
+        "List": {
+        "annotations": {
+            "doc": "an entity type representing a list",
+            "docComment": "any entity type is a child of type `Application`"
+        },
+        "memberOfTypes": [
+            "Application"
+        ],
+        "shape": {
+            "type": "Record",
+            "attributes": {
+            "editors": {
+                "type": "Team"
+            },
+            "name": {
+                "type": "String"
+            },
+            "owner": {
+                "type": "User"
+            },
+            "readers": {
+                "type": "Team"
+            },
+            "tasks": {
+                "type": "Tasks"
+            }
+            }
+        }
+        }
+    },
+    "actions": {
+        "CreateList": {
+         "annotations": {
+            "doc": "actions that a user can operate on a list"
+        },
+        "appliesTo": {
+            "resourceTypes": [
+            "Application"
+            ],
+            "principalTypes": [
+            "User"
+            ]
+        }
+       }
+    }
+  }
+}
+</code></pre>
+<h2 id="drawbacks"><a class="header" href="#drawbacks">Drawbacks</a></h2>
+<ol>
+<li>Complexity: adds more complexity to schema</li>
+<li>Oddness around syntax for Common Types in JSON form</li>
+<li>By not taking a stance on annotation meanings, it makes it harder for a standard to form around them (ex: for doc strings)</li>
+<li>Multi-line docstrings are technically valid but awkward.</li>
+</ol>
+<h2 id="alternatives"><a class="header" href="#alternatives">Alternatives</a></h2>
+<h3 id="take-a-stance"><a class="header" href="#take-a-stance">Take a stance</a></h3>
+<p>Reverse our decision around annotations and start taking stances on what annotations mean.
+This lets us standardize certain annotations, like <code>doc</code>.
+This probably can't happen unless we also do this for policies, which we've said we don't want to do.</p>
+<h3 id="doc-strings-as-comments"><a class="header" href="#doc-strings-as-comments">Doc Strings as comments</a></h3>
+<p>Instead of annotations, we could add "doc-strings" as a first class feature.
+Could look like this:</p>
+<pre><code>/# Stop users from accessing a high security document unless:
+/#  A) The principal and user are at the same location
+/#  B) The principal has a job level greater than  4
+forbid(principal, action, resource) when {
+    resource.security_level == "HIGH"
+unless {
+    (resource.location == principal.location) || (principal.job_level &gt; 4 )
+};
+</code></pre>
+<p>This has nice and easy multi-line syntax, but is special cased and not as general.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="0034-precomputed-entity-attributes.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="0052-reserved-namespaces.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="0034-precomputed-entity-attributes.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="0052-reserved-namespaces.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

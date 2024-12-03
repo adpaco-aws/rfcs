@@ -1,0 +1,557 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>0076-entity-slice-validation - Cedar RFC Book</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Cedar RFC Book</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="entity-slice-validation"><a class="header" href="#entity-slice-validation">Entity Slice Validation</a></h1>
+<h2 id="related-issues-and-prs"><a class="header" href="#related-issues-and-prs">Related issues and PRs</a></h2>
+<ul>
+<li>Reference Issues:</li>
+<li>Implementation PR(s):</li>
+</ul>
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li>Started: 2024-08-01</li>
+</ul>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>This RFC introduces "Entity Slicing Validation" (ESV), which consists of</p>
+<ol>
+<li>An additional validation check, and</li>
+<li>A generic entity slicing algorithm</li>
+</ol>
+<p>The two are connected by the concept of a "level," which defines the depth from root variables (like <code>principal</code> and <code>resource</code>) at which entity dereferencing operations may safely take place in policies. The validation check ensures that policies never dereference beyond the given level. The slicing algorithm determines what entities are needed to safely decide an authorization request when evaluating policies valid at a given level.</p>
+<h2 id="basic-example"><a class="header" href="#basic-example">Basic example</a></h2>
+<p>Consider the following <a href="https://github.com/cedar-policy/cedar-examples/blob/release/3.2.x/tinytodo/policies.cedar">policies</a>, taken from the <a href="https://github.com/cedar-policy/cedar-examples/tree/release/3.2.x/tinytodo">TinyTodo example application:</a></p>
+<pre><code>// Policy 1: A User can perform any action on a List they own
+permit (
+  principal,
+  action,
+  resource is List
+)
+when { resource.owner == principal };
+
+// Policy 2: A User can see a List if they are either a reader or editor
+permit (
+    principal,
+    action == Action::"GetList",
+    resource
+)
+when { principal in resource.readers || principal in resource.editors };
+
+// Policy 4: Admins can perform any action on any resource
+permit (
+  principal in Team::"Admin",
+  action,
+  resource
+);
+</code></pre>
+<p>We suppose (per the <a href="https://github.com/cedar-policy/cedar-examples/blob/release/3.2.x/tinytodo/tinytodo.cedarschema">schema</a>, not shown) that <code>principal</code> always has entity type <code>User</code>, and <code>resource</code> always has entity type <code>List</code>. These policies are valid at level 1, meaning that variables <code>principal</code>, <code>action</code>, <code>resource</code> and <code>context</code> are only <em>directly</em> dereferenced, i.e., any entities they reference are not themselves dereferenced.</p>
+<p>For example, in policy 1, the expression <code>resource.owner == principal</code> directly dereferences <code>resource</code> by accessing the contents of its <code>owner</code> attribute. In policy 2, expression <code>principal in resource.readers</code> directly dereferences <code>resource</code> to retrieve the contents of its <code>readers</code> attribute, and also directly dereferences <code>principal</code> to retrieve its ancestors, to see whether one might be equal to the contents of <code>resource.readers</code>. Policy 4 also directly dereferences <code>principal</code> to access its ancestors, to see if one is <code>Team::"admin"</code>.</p>
+<p>Because these policies are valid at level 1, applications submitting authorization requests only need to provide entity data for entities provided as variables, and nothing else. For example, say we want to evaluate the request (<code>User::"Aaron"</code>, <code>Action::"GetList"</code>, <code>List::"Objectives"</code>, <code>{}</code>). Then we would only need to provide entity data (direct attributes and ancestors) for <code>User::"Aaron"</code>, <code>Action::"GetList"</code>, and <code>List::"Objectives"</code>. There is no need to provide data for entities referenced from these entities. For example, suppose the <code>readers</code> attribute of <code>List::"Objectives"</code> is <code>Team::"interns"</code>; there is no need to provide data for <code>Team::"interns"</code> because we know it will never, itself, be dereferenced when evaluating these policies. There is also no need to provide entity data for other entities directly mentioned in policies, e.g., <code>Team::"Admin"</code>.</p>
+<p>Now suppose we wanted to extend our TinyTodo policies with the following:</p>
+<pre><code>// Policy 6: No access if not high rank and at location DEF, 
+// or at resource's owner's location
+forbid(
+    principal,
+    action,
+    resource is List
+) unless {
+   principal.joblevel &gt; 6 &amp;&amp; principal.location like "DEF*" ||
+   principal.location == resource.owner.location
+};
+</code></pre>
+<p>This policy does <em>not</em> validate at level 1. That is because the expression <code>resource.owner.location</code> is only valid at level 2: It requires dereferencing <code>resource</code> to retrieve the entity in the <code>owner</code> attribute, and then requires dereferencing that entity to obtain the contents of its <code>location</code> attribute. As a result, if we only provided the <code>principal</code> and <code>resource</code> entity data, as described above, evaluating policy 6 could produce an evaluation error since data may not be provided for <code>resource.owner</code>.</p>
+<p>All of the Cedar example policy sets validate with level-based validation, either at level 1 or 2; see the Appendix for details.</p>
+<h2 id="motivation"><a class="header" href="#motivation">Motivation</a></h2>
+<p>Currently, Cedar provides no support for slicing. Users are required to either be inefficient and produce their entire entity store as a slice, or derive their own ad-hoc slicing algorithm. We'd like to provide an out-of-the-box solution that addresses many user's needs. Entity slicing in general is a problem very tied to the specifics of application/deployment. It's likely impossible to have a fully general solution. This RFC is attempting to provide a solution for entity slicing that works for the 80% case, while acknowledging that it won't work for everyone.</p>
+<p>Additionally, there are some application scenarios where the actors writing the policies and the people performing slicing are not the same people, and thus the slicers need to impose some kind of restrictions on policy authors.</p>
+<p>This RFC has a close connection to <a href="https://github.com/cedar-policy/rfcs/pull/74">RFC 74: Entity Slicing using Data Tries</a>, which also seeks to provide a sound foundation for entity slicing. We discuss the relationship between them in the Alternatives below; ultimately, we believe they are complementary and should coexist.</p>
+<h2 id="detailed-design"><a class="header" href="#detailed-design">Detailed design</a></h2>
+<h3 id="entity-dereferences"><a class="header" href="#entity-dereferences">Entity dereferences</a></h3>
+<p>An "Entity Dereference" is any operation that requires directly accessing an entity’s data. The following is an exhaustive list of entity dereferencing operations</p>
+<ol>
+<li><code>e1 in e2</code> dereferences <code>e1</code> (but not <code>e2</code>)</li>
+<li><code>e1.foo</code> dereferences <code>e1</code> iff <code>e1</code> is an entity</li>
+<li><code>e1 has foo</code> dereferences <code>e1</code> iff <code>e1</code> is an entity</li>
+</ol>
+<p>Note that testing equality <em>is not</em> a dereferencing operation. Therefore expressions like <code>e1 == e2</code>, <code>e1.contains(e2)</code> and <code>e3 in e2</code> do not dereference <code>e1</code> or <code>e2</code>.</p>
+<p>Also note that by “dereference” above, we are only referring to the given operation, not about any operations that might be executed to evaluate subexpressions. For example, while <code>e1 in e2</code> only dereferences <code>e1</code> (per rule 1 above), if <code>e2</code> is <code>principal.foo</code>, then of course evaluating <code>e2</code> dereferences <code>principal</code> (per rule 2 above).</p>
+<h3 id="entity-roots"><a class="header" href="#entity-roots">Entity roots</a></h3>
+<p>The variables <code>principal</code>, <code>action</code>, and <code>resource</code> are <em>entity roots</em>. (Entity literals are <em>not</em> entity roots, and operations on such literals are limited, as described below. Slots and the <code>Unknown</code> entity are treated as entity literals because slots will be replaced by literals and <code>Unknown</code> cannot be dereferenced.) They directly name entities from a request that could be dereferenced in a policy. A <code>context</code> is not an entity root directly; rather, any attributes it (transitively) contains that have entity type are considered roots. For example, consider the following schema:</p>
+<pre><code>entity User {
+    manager: User,
+    age: Long,
+};
+action getDetails appliesTo {
+    principal: User,
+    resource: User,
+    context: {
+        admin: User,
+        building: { location: Long, ITDeptHead: User },
+        foo: { inner: User },
+        bar: { inner: User }
+    }
+};
+</code></pre>
+<p>Here, <code>principal</code>, <code>action</code>, and <code>resource</code> are entity roots (as usual), as are:</p>
+<ul>
+<li><code>context.admin</code></li>
+<li><code>context.building.ITDeptHead</code></li>
+<li><code>context.foo.inner</code> , and</li>
+<li><code>context.bar.inner</code></li>
+</ul>
+<p>Note that <code>context</code>,  <code>context.building</code>, and  <code>context.building.location</code> are <em>not</em> entity roots because they do not have entity type. Moreover, <code>context.admin.manager</code> is not an entity root because <code>manager</code> is not an attribute of <code>context</code> itself.</p>
+<h3 id="dereference-levels"><a class="header" href="#dereference-levels">Dereference levels</a></h3>
+<p>During validation, we extend entity types with a <em>level</em>, which is either <code>∞</code> or a natural number. We call these <em>leveled entity types</em>. The level expresses how many entity dereferences are permitted starting from an expression having that type. Levels on types are only used internally; policy/schema writers never see them. When the level is <code>∞</code>, validation is unchanged from the status quo.</p>
+<h3 id="specifying-the-level"><a class="header" href="#specifying-the-level">Specifying the level</a></h3>
+<p>The maximum level that policies may validate at is specified as a parameter to the validator. Schemas are unchanged. Just like Cedar currently supports strict (the default) and permissive validation, it would now support those things with the additional parameter of what level at which to validate. As discussed in the alternatives below, a drawback of this approach is that policy writers cannot look in one place (the schema) to know the limits on the policies they can write. But in a sense, due to the dichotomy of strict vs. permissive validation, that's already the case.</p>
+<h3 id="validation-algorithm"><a class="header" href="#validation-algorithm">Validation algorithm</a></h3>
+<p>Validation works essentially as today (see our <a href="https://dl.acm.org/doi/pdf/10.1145/3649835">OOPSLA’24 paper</a>, page 10), but using leveled types. To validate a policy c at level N, we use a request environment which maps <code>principal</code>, <code>resource</code>, and <code>context</code> to leveled types with level N. For example, for the schema given above, to validate at level 2 our request environment would map <code>principal</code> to <code>User</code>(2), <code>resource</code> to <code>User</code>(2), and <code>context</code> to the type given in the schema annotated with 2, i.e., <code>{ admin: User(2), building: { location: Long, ITDeptHead: User(2) },... }</code>.</p>
+<p>The rules for expression <code>e1 in e2</code> (line (3) in Fig. 7)(a) in the paper) are extended to require that the entity type of <code>e1</code> is <code>E1(n)</code> where <code>n &gt; 0</code>. This requirement indicates that <code>e1</code> must be an entity from which you can dereference at least one level (to access its ancestors).</p>
+<p>The rules for expression <code>e has f</code> and <code>e.f</code> (line (6) in Fig. 7(a) in the paper) are extended so that if <code>e</code> has entity type, then its type must be <code>E(n)</code> where <code>n &gt; 0</code>. The rule for <code>e.f</code> is additionally extended so that if <code>e.f</code> has entity type <code>F</code> (per the schema), then the the final type is leveled as one less than <code>n</code>; e.g., if <code>e</code> has level <code>n</code>, then final expression has type F<code>(n-1)</code>. (Rules for <code>e has f</code> and <code>e.f</code> are unchanged when <code>e</code> has record type.)</p>
+<p>The rule for entity literals (not shown in the paper) always ascribes them level 0 unless we are validating at level  <code>∞</code>. For example, the type of expression <code>User::"Alice"</code> is <code>User(0)</code>. This is because we do not permit dereferencing literals in policies when using leveled validation. (See the Alternatives below for a relaxation of this restriction.)</p>
+<p>We extend the subtyping judgment (Fig 7(b) in the paper) with the following rule: <code>E(n) &lt;: E(n-1)</code>. That is, it is always safe to treat a leveled entity type at level <code>n</code> as if it had fewer levels. This rule is important when multiple expressions are required to have the same level. For example:</p>
+<pre><code>if (principal.age &lt; 25) then
+  principal.manager
+else
+  principal
+</code></pre>
+<p>Suppose we are validating at level 2, then this expression will have type <code>User(1)</code>, where we use subtyping to give expression <code>principal</code> (in the else branch) type <code>User(1)</code> rather than <code>User(2)</code>. Similarly, if we were defining a set of entities, all of them must be given the same level. For example, we could give <code>[ principal.manager, principal ]</code> the type <code>Set&lt;User(1)&gt;</code>. Note that for records, individual attributes may have entities with different levels. E.g., <code>{ a: principal, b: principal.manager }</code> would have type <code>{ a: User(2), b: User(1) }</code>.</p>
+<h3 id="slicing"><a class="header" href="#slicing">Slicing</a></h3>
+<p>Once a schema has been validated against a non- infinite level, we can use the following procedure at runtime to compute the entity slice:</p>
+<pre><code>/// Takes:
+/// request : The request object
+/// level : The level the schema was validated at 
+/// get-entity : A function for looking up entity data given an EUID 
+function slice(request, level, get-entity) { 
+    // This will be our entity slice
+   let mut es : Map&lt;EUID, EntityData&gt; = {};
+
+   let mut worklist : Set&lt;EUID&gt; = {principal, action, resource, all root euids in context};
+   for euid in worklist {
+     es.insert(euid, get-entity(euid));
+   }
+   
+   let current-level = 0;
+   
+   while current-level &lt;= level || worklist.empty? {
+        // `t` will become our new worklist
+        let t : Set&lt;EUID&gt; = {};
+        // Clear our worklist
+        for euid in worklist {
+            if !es.contains(euid) {
+                es.insert(euid, get-entity(euid));
+            }
+            // Set of all euids mentioned in this entities data
+            let new-euids = filter(not-in-es?, all-euids(es.get(euid)));
+            t = t.union(new-euids);
+        }
+        // set t to be the new worklist
+        s = t;
+        // increment level
+        level = level + 1;
+   }
+
+    return es;
+}
+
+</code></pre>
+<h3 id="soundness"><a class="header" href="#soundness">Soundness</a></h3>
+<p>Leveled types permit us to generalize the soundness statement we use today. Currently, soundness assumes that expressions like <code>principal.manager</code> will never error, i.e., that the proper entity information is available. Now we assume dereferences are only available up to a certain level. In particular, we define a well-formedness judgment μ ⊢ v : τ where μ is an entity store, v is a value, and τ is a possibly leveled type. This judgment is standard for values having non-entity type, e.g.,</p>
+<pre><code>mu |- i : Long
+
+mu |- s : String
+
+mu |- v1 : T1 ... mu |- vn : Tn 
+-------------------------------------------------------
+mu |- { f1: v1, ..., fn: vn } : { f1: T1, ..., fn: Tn }
+</code></pre>
+<p>There are two rules for entity literals of type <code>E::s</code>. The first says level <code>0</code> is always allowed. The second says a literal can have a level <code>n</code> only if <code>n</code> dereferences are possible starting from <code>E::s</code>:</p>
+<pre><code>mu |- E::s : E(0)
+
+mu(E::s) = (v,h) where v = { f1: v1, ..., fn: vn } and h is an ancestor set
+mu |- v1 : T1 ... mu |- vn : Tn
+where level(T1) &gt;= n-1 ... level(Tn) &gt;= n-1
+------------------------------------------------------------------------------------
+mu |- E::s : E(n) where n &gt; 0
+</code></pre>
+<p>The auxiliary function <code>level(T)</code> identifies the lower-bound of the level of type <code>T</code>. It’s defined as follows:</p>
+<ul>
+<li><code>level(E(n))</code> = <code>n</code></li>
+<li><code>level({ f1: T1, ..., fn: Tn })</code>  = <code>m</code> where <code>m</code> = <code>min(level(T1),...,level(Tn))</code></li>
+<li><code>level(Long)</code> = <code>level(String)</code> = <code>level(Boolean)</code> = <code>level(Set(T))</code> = (etc.) = ∞ for all other types</li>
+</ul>
+<p>Thus the soundness statement says that</p>
+<ol>
+<li>If policy set <code>p</code> is validated against a schema <code>s</code> with level <code>l</code>, where  <code>l &lt; ∞</code> .</li>
+<li>If entity store μ is validated against schema <code>s</code></li>
+<li>If request σ is validated against schema <code>s</code></li>
+<li>If μ ⊢ σ(principal): E(l) where E is the expected type of the principal for this particular action, and  similarly check the proper leveling of action, request, and context.</li>
+<li>Then:
+<ol>
+<li><code>isAuthorized(sigma, p, mu)</code> is either a successful result value or an integer overflow error
+<ol>
+<li>All errors except integer overflow + missing entity are prevented by the current validator</li>
+<li>missing entity errors are prevented by the new validator + slicer</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<p>We extend the proof of soundness to leverage premise #4 above: This justifies giving <code>principal</code> a type with level l in the initial request context, and it justifies the extensions to the rules that perform dereferencing, as they decrease the leveled result by 1, just as the μ⊢v:τ rule does, which we are given.</p>
+<p>We also want to prove the soundness of the <code>slice(request, level, get-entity)</code> procedure defined above: If <code>slice</code>(σ, <code>l</code>, <code>get-entity</code>) = μ and request σ is validated against schema <code>s</code> and level <code>l</code>, then μ validates against schema <code>s</code> at level <code>l</code>.</p>
+<h2 id="drawbacks"><a class="header" href="#drawbacks">Drawbacks</a></h2>
+<p>Level-based slicing is coarse-grained: <em>all</em> attributes up to the required level, and <em>all</em> ancestors, for each required entity must be included in the slice. Much of this information may be unnecessary, though, depending on the particulars of the request. For example, for the TinyTodo policies in our detailed example, if the action in the request was <code>Action::"CreateList"</code>, then only policies 1 and 4 can be satisfied. For these policies, no ancestor data for <code>principal</code> and <code>resource</code> is needed, and only the contents of <code>resource.owner</code>, and not (say) <code>resource.readers</code> and <code>resource.editors</code>, is required. For some applications, the cost to retrieve all of an entity’s data and then pass it to the Cedar authorizer could be nontrivial, so a finer-grained approach may be preferred. Some ideas are sketched under alternatives.</p>
+<p>Implementing levels is a non-trivial effort: We must update the Rust code for the validator of policies and entities, and the Lean code and proofs. We also must provide code to perform level-based slicing.</p>
+<h2 id="alternatives"><a class="header" href="#alternatives">Alternatives</a></h2>
+<h3 id="alternative-entity-slicing-using-data-tries"><a class="header" href="#alternative-entity-slicing-using-data-tries">Alternative: Entity Slicing using Data Tries</a></h3>
+<p><a href="https://github.com/cedar-policy/rfcs/pull/74">RFC 74, Entity Slicing using Data Tries</a> proposes the idea of an <em>entity manifest</em> to ease the task of entity slicing. This manifest is a trie-based data structure that expresses which entity attributes and ancestors are needed for each possible action. This data structure is strictly more precise than the concept of level, meaning that it may require less entity data to be provided. For example, the first part of our Basic Example in this RFC (policies 1, 2, and 4 of TinyTodo), the determined entity manifest would indicate that for the <code>GetList</code> action, you would need to provide <code>resource.owner</code>, <code>resource.readers</code>, <code>resource.editors</code> and the ancestors of <code>principal</code>. This is less data than would be retrieved by the slicing algorithm proposed here: These are level-1 valid policies, so the generic algorithm would acquire the same data given in the manifest but also more, e.g., the ancestors of <code>resource</code> and the attributes of <code>principal</code>.</p>
+<p>Entity manifests are less effective as a <em>prescriptive</em> mechanism that aims to limit the shape of allowable policies. For example, a Cedar policy and entity storage service might like to disallow uploading policies whose entity data is expensive to retrieve in the worst case. With levels, such a service can upper-bound this work by blocking schemas with a level greater than a threshold, say 3. Validation will then ensure that uploaded policies respect this upper bound. Manifests are unwieldy as a specification mechanism, since they are specialized to particular entity definitions and name particular types and attributes, of which there could be many. They'd also have to be updated as types evolved over time, while a level-based specification is less likely to change.</p>
+<p>We believe that ultimately level-based validation and entity manifests should coexist. Level-based validation is used to bound entity retrieval work and prevent pathological policies, while entity manifests are used to more efficiently define the needed entity data. We could imagine a deployment strategy in which we accept this RFC and perform generic entity slicing as described here, and then later implement entity manifests, and start performing slicing using those instead.</p>
+<h3 id="alternative-level-in-the-schema-not-as-a-validation-parameter"><a class="header" href="#alternative-level-in-the-schema-not-as-a-validation-parameter">Alternative: Level in the schema, not as a validation parameter</a></h3>
+<p>Instead of specifying the validation level as a parameter to the validation algorithm, we could specify it directly in schemas. The benefit of this is that policy writers can see the expected form of policies in one place. For example, we could extend our schema from the initial example as follows:</p>
+<pre><code>level = 1;
+entity User {
+    manager: User,
+    age: Long,
+};
+action getDetails appliesTo { ... }
+</code></pre>
+<p>Policy writers know, by seeing <code>level = 1</code>, that they can write <code>principal.manager</code> in policies, but not <code>principal.manager.manager</code>.</p>
+<p>On the other hand, you could imagine that different applications might like to use the same schema file but have different restrictions on entity retrieval, owing to the efficiency of a chosen storage strategy. For example, in a graph database, retrieving data may be efficient no matter what the level is, whereas in a relational database, each level might necessitate another join query, which could be very inefficient.</p>
+<p>Specifying levels in schemas also adds a complication when multiple schema files are used during validation. When a user specifies multiple files, they are effectively concatenated together by validator. What should happen if multiple files specify <code>level</code> and the level is different? One approach is that the validator would allow at most one to have a <code>level</code> specification, else it's an error. Doing so serves the expected use-case that one of those files will be for the application, specifying the <code>action</code> types and the <code>level</code>, while any others will be only general <code>entity</code> and <code>type</code> definitions, which are not application specific and thus need not concern themselves with entity slicing.</p>
+<h3 id="alternative-per-entity-levels-rather-than-a-global-level"><a class="header" href="#alternative-per-entity-levels-rather-than-a-global-level">Alternative: Per-entity levels, rather than a global level</a></h3>
+<p>We might refine in-schema <code>level</code> to not apply to all entities, but rather to particular entity types. For example, for <code>User</code> entities (bound to <code>principal</code>) we might specify level 2 but for any other entity type we specify <code>level</code> as 0, as per the following schema:</p>
+<pre><code>@level(2)
+entity Issue = {
+  repo: Repository
+};
+@level(0)
+entity Repository = {
+  owner: User,
+  readers: Set&lt;User&gt;,
+};
+@level(0)
+entity User = {
+  manager: User
+};
+action ReadIssue appliesTo { principal: User, resource: Issue };
+</code></pre>
+<p>Per-entity levels allows you to reduce the entities you provide in the slice — given a request, you get the types of the principal and resource entities, look up what their levels are from the schema, and then provide data up to that level for each. Validation for per-entity levels is also a straightforward generalization of the algorithm sketched above.</p>
+<p>Note that per-entity levels adds some complication to understandability, in particular for nested attributes. The question is whether the performance benefits are worth it. Suppose I have a policy</p>
+<pre><code>permit(principal, action, resource) when {
+  resource.repo.owner.manager == principal
+};
+</code></pre>
+<p>This is allowed because <code>Issue</code> is labeled with level 2. That means that we are allowed to write <code>resource.repo.owner.manager</code> (two levels of dereference beyond the first, allowed one by level 0). But this is a little confusing because we wrote <code>@level(0)</code> on <code>Repository</code>, and yet we are accessing one of its attributes. The reason that’s Ok is that <code>Repository</code> never actually is bound to <code>principal</code> or <code>resource</code>, so the level is irrelevant.</p>
+<h3 id="alternative-full-support-for-entity-literals"><a class="header" href="#alternative-full-support-for-entity-literals">Alternative: Full support for entity literals</a></h3>
+<p>Entity literals cannot be dereferenced. That means that, <em>at all levels</em>, they can only appear in <code>==</code> expressions or on the RHS of <code>in</code>. This captures use-cases that we know about. However, if you wanted to use them on the LHS of <code>in</code> or access their attributes, one approach to doing this would be to extend <a href="https://github.com/cedar-policy/rfcs/blob/main/text/0053-enum-entities.md">enumerated entity types</a> to normal entity type definitions. For example,</p>
+<pre><code>entity User in [Team] enum { "default" @level } = {
+  manager: User,
+  organization: Org
+}; 
+</code></pre>
+<p>This would say that there is a <code>User</code> entity whose ID is <code>default</code> which should always be present in the entity slice, e.g., along with other entities for the principal, resource, etc. That presence is at the level specified globally, e.g., if level was 1, then just the <code>User::"default"</code> and its direct attributes would be included, but not the entities those attributes point to.</p>
+<h3 id="alternatives-extensions-to-reduce-ancestor-requirements"><a class="header" href="#alternatives-extensions-to-reduce-ancestor-requirements">Alternatives: Extensions to reduce ancestor requirements</a></h3>
+<p>One drawback of level is that it gets <em>all</em> of an entity’s ancestors when it is included in a slice. This could be very expensive in the case that the entity has many such ancestors. For example, in TinyTodo, each <code>User</code> has <code>Team</code>-typed ancestors that correspond to the <code>viewers</code> or <code>editors</code> of the <code>List</code> entities which they can access. This could be 1000s of lists, which are expensive to acquire and to include in the request (especially if calling AVP). Worse, this work is apparently wasted because the policies can only ever look at <em>some</em> of these ancestors, notably those reachable from the <code>editors</code> or <code>viewers</code> of the resource <em>also provided in the request</em>.</p>
+<p>Instead of passing in a principal in a request with all of its ancestors, we could just as well pass in only those that are possibly referenced by policy operations. For TinyTodo, it would be those equal to <code>resource.viewers</code> or <code>resource.editors</code> (if they match). Since this invariant is not something the application necessarily knows for certain (it might be true of policies today, but those policies could change in the future), we want a way to <strong>reduce the provided ancestor data while being robust to how policy changes in the future</strong>. Here are three possible approaches to addressing this issue.</p>
+<h4 id="alternative-1-leverage-partial-evaluation"><a class="header" href="#alternative-1-leverage-partial-evaluation">Alternative 1: Leverage partial evaluation</a></h4>
+<p>We can use partial evaluation to solve this problem: Specify a concrete request with all of the needed attribute data, after entity selection, but <strong>set the ancestor data as **** <em>unknown</em></strong>. Partially evaluating such a request will result in results that have incomplete entity checks. These checks can then be handled by the calling application. This might be a nice feature we can package up and give to customers as a client-side library.</p>
+<p>A drawback of this approach is that it could slow down evaluation times. This is because the entity hierarchy is used to perform policy slicing. In the worst case, you’d have to consider all possible policies. It might be possible to provide at least <em>some</em>of the hierarchy with the request to reduce the set of policies that are partially evaluated.</p>
+<h4 id="alternative-2-ancestor-allow-lists"><a class="header" href="#alternative-2-ancestor-allow-lists">Alternative 2: Ancestor allow-lists</a></h4>
+<p>When validating static policies, it’s possible to see which ancestors are potentially needed. Could we do something similar to level for policy validation, but for ancestors instead?</p>
+<p>For TinyTodo policies above, we see the following expressions in policies:</p>
+<ul>
+<li><code>principal in resource.viewers</code></li>
+<li><code>principal in resource.editors</code></li>
+<li><code>principal in Team::"admin"</code></li>
+</ul>
+<p>For the other examples, the situation is similar. We also see multi-level access, e.g., with GitHub policies <code>principal in resource.repo.readers</code>, and we see recursive access through sets, e.g., for Hotel Chains we see <code>resource in principal.viewPermissions.hotelReservations</code> where <code>hotelReservations</code> is a set containing entities, rather than being a single entity.</p>
+<p><em>Approach</em>: Add an annotation <code>@ancestors</code> to the <code>in</code> declarations around entities. When I write <code>entity User in [Team]</code>, add an annotation that enumerates the <code>Team</code>-typed expressions that can be on the RHS of <code>in</code> in policies. Here’s an example of the annotated TinyTodo schema:</p>
+<pre><code>@ancestors(resource.viewers,resource.editors,Team::"admin",Team::"interns")
+entity User in [Team, Application] = {
+  "joblevel": Long,
+  "location": String,
+};
+@ancestors()
+entity Team in [Team, Application];
+@ancestors()
+entity List in [Application] = {
+  "editors": Team,
+  "name": String,
+  "owner": User,
+  "readers": Team,
+  "tasks": Tasks,
+};
+@ancestors()
+entity Application;
+...
+</code></pre>
+<p>Notice that we annotate <code>List</code>, <code>Team</code>, or <code>Application</code> with <code>()</code> since entities of these types never appear on the LHS of <code>in</code>. An entity type with no annotation at all is assumed to require every potential ancestor.</p>
+<p><em>Validation</em>: The validator will check for syntactic equality against the expressions in the annotation. In particular, when it sees an expression <code>E in F</code> in a policy, if <code>E</code> has an entity type that is annotated with the set of expressions <code>S</code> in the schema, then the validator will check that <code>F</code> ∈ <code>S</code>, using syntactic equality. With the above schema, all current TinyTodo policies would validate, while the following would not</p>
+<pre><code>// Fails because a Team-typed entity is on the LHS of `in`,
+//   but entity Team has no legal RHS expressions per the schema
+permit(principal,action == Action::"GetList",resource)
+when { resource.editors in Team::"admin" };
+
+// Fails because Team::"temp" is not a legal RHS expression for User
+permit(principal in Team::"temp",action,resource);
+</code></pre>
+<p><em>Entity selection</em>: When collecting ancestors during entity selection, the application only gets ancestors per the expressions in the annotation. To do that, it would evaluate these expressions for the current request, and provide the ancestors present in the result, if present. For example, suppose our TinyTodo request was</p>
+<pre><code>principal = User::"Alice"
+action    = Action::"GetList"
+resource  = List::"123"
+context   = {}
+</code></pre>
+<p>Since TinyTodo policies are level 2, we would provide entity data for both <code>User::"Alice"</code> and <code>List::"123"</code>. Suppose that the latter’s data is</p>
+<pre><code>{ id = "123", 
+  owner = User::"Bob",
+  viewers = Team::"123viewers",
+  editors = Team::"123editors"
+}
+</code></pre>
+<p>The <code>principal</code> has type <code>User</code>, which is annotated in the schema with the following expressions, shown with what they evaluate to:</p>
+<ul>
+<li><code>resource.viewers</code> evaluates to <code>List::"123".viewers</code> which evaluates to <code>Team::"123viewers"</code></li>
+<li><code>resource.editors</code> evaluates to <code>List::"123".editors</code> which evaluates to <code>Team::"123editors"</code></li>
+<li><code>Team::"admin"</code> (itself)</li>
+<li><code>Team::"interns"</code> (itself)</li>
+</ul>
+<p>Thus the application knows we can determine in advance whether <code>User::"Alice"</code> (the <code>principal</code>) has any of these four ancestors, and include them as such with <code>User::"Alice"</code>’s entity data, if so. No other ancestor data needs to be provided.</p>
+<p>Note: The above algorithm i not very helpful for templates containing expressions <code>in ?resource</code> or <code>in ?principal</code> ( (templates with only <code>== ?principal</code> and <code>== ?resource</code> in them are fine, since they don’t check the ancestors). For these, you are basically forced to not annotate the entity type because <code>?resource</code> and <code>?principal</code> are not legal expressions. This makes sense inasmuch as a template with constraint <code>principal in ?principal</code> tells us nothing about possible values to which <code>?principal</code> could be linked — the values could include potentially any entity, so in the worst case we’d need to include all possible ancestors. It may be that you could use further contextual data (like the action) to narrow the ones you provide.</p>
+<p>Note: Interestingly, no policy-set example ever has an expression other than <code>principal</code> or <code>resource</code> on the LHS of <code>in</code>. The scheme above is not leveraging this fact.</p>
+<p>Note: This approach composes nicely with the per-entity <code>@level</code> approach sketched above.</p>
+<h3 id="alternative-reduce-attribute-requirements"><a class="header" href="#alternative-reduce-attribute-requirements">Alternative: Reduce attribute requirements</a></h3>
+<p>The per-entity level approach is one way to reduce attribute requirements, but only across levels — for a particular entity you still must provide <em>all</em> of its attributes if you are providing its data. We might like to provide only <em>some</em> attributes, similar to the alternative that requires only some, not all, ancestors.</p>
+<p>As discussed earlier, partial evaluation can be used to help here. There could also be some sort of allow-list for attributes. Probably it would make sense to associate allow-lists with actions.</p>
+<h2 id="appendix-accepted-policy-sets"><a class="header" href="#appendix-accepted-policy-sets">Appendix: Accepted policy sets</a></h2>
+<p>All existing policies in published example Cedar applications can be validated using levels. In particular, the following policy sets validate at level 1:</p>
+<ul>
+<li>Tags and roles: https://github.com/cedar-policy/cedar-examples/tree/main/cedar-example-use-cases/tags_n_roles</li>
+<li>Sales orgs: https://github.com/cedar-policy/cedar-examples/tree/main/cedar-example-use-cases/sales_orgs</li>
+<li>Hotel chains: https://github.com/cedar-policy/cedar-examples/tree/main/cedar-example-use-cases/hotel_chains</li>
+</ul>
+<p>And the following validate at level 2:</p>
+<ul>
+<li>TinyTodo: https://github.com/cedar-policy/cedar-examples/blob/main/tinytodo/policies.cedar and also https://github.com/cedar-policy/cedar-examples/blob/main/tinytodo/policies-templates.cedar
+<ul>
+<li>Policy 6 includes expression <code>resource.owner.location</code></li>
+</ul>
+</li>
+<li>Tax Preparer: https://github.com/cedar-policy/cedar-examples/blob/main/cedar-example-use-cases/tax_preprarer/policies.cedar
+<ul>
+<li>The access rule involves checking something to the effect of <code>principal.assigned_orgs.contains(resource.owner.organization)</code>.</li>
+</ul>
+</li>
+<li>Document cloud: https://github.com/cedar-policy/cedar-examples/blob/main/cedar-example-use-cases/document_cloud/policies.cedar
+<ul>
+<li>This has policy expression <code>(resource.owner.blocked.contains(principal) || principal.blocked.contains(resource.owner))</code>. (It would not make sense to duplicated the <code>blocked</code></li>
+</ul>
+</li>
+<li>GitHub: https://github.com/cedar-policy/cedar-examples/blob/main/cedar-example-use-cases/github_example/policies.cedar
+<ul>
+<li>Expressions like <code>principal in resource.repo.readers</code> are common: A resource like an issue or pull request inherits the permissions of the repository it is a part of, so the rules chase a pointer to that repository.</li>
+</ul>
+</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="0071-trailing-commas.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="0080-datetime-extension.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="0071-trailing-commas.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="0080-datetime-extension.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>0052-reserved-namespaces - Cedar RFC Book</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Cedar RFC Book</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="reserve-identifiers-for-internal-use"><a class="header" href="#reserve-identifiers-for-internal-use">Reserve Identifiers for Internal Use</a></h1>
+<h2 id="related-issues-and-prs"><a class="header" href="#related-issues-and-prs">Related issues and PRs</a></h2>
+<ul>
+<li>Reference Issues: https://github.com/cedar-policy/cedar/issues/920</li>
+<li>Implementation PR(s): https://github.com/cedar-policy/cedar/pull/969</li>
+</ul>
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li>Started: 2024-02-14</li>
+<li>Accepted: 2024-06-10</li>
+<li>Landed: 2024-07-15 on <code>main</code> (<a href="https://github.com/cedar-policy/cedar/pull/969">#969</a>)</li>
+<li>Released: TBD</li>
+</ul>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>This RFC extends the reservation of the <code>__cedar</code> namespace in schema in <a href="https://github.com/cedar-policy/rfcs/blob/main/text/0024-schema-syntax.md">RFC24</a> and
+proposes reserving all namespaces and identifiers where the first element is <code>__cedar</code>,
+forbidding their use in Cedar policies, schema, and entity data so that they can be used by future Cedar language features.</p>
+<h2 id="basic-example"><a class="header" href="#basic-example">Basic example</a></h2>
+<p>Under this RFC the names <code>__cedar</code>, <code>__cedar::Long</code>, and <code>__cedar::namespace::User</code> will all become invalid in all contexts.</p>
+<p>These would be rejected in a policy</p>
+<pre><code class="language-cedar">permit(principal == __cedar::User::"alice", actions, resource);
+</code></pre>
+<p>in a schema</p>
+<pre><code>namespace __cedar {
+    entity User;
+}
+</code></pre>
+<p>and in entity data</p>
+<pre><code class="language-json">[
+    {
+        "uid": { "__entity": {
+            "type": "__cedar::User",
+            "id": "alice"
+        }},
+        "attrs": {},
+        "parents": []
+    }
+]
+</code></pre>
+<p>In this entity data example, the <code>__entity</code> JSON key does not demonstrate the new reserved namespace mechanism.
+It is a place were we already assign special significance to some identifiers starting with <code>__</code> in entity data.</p>
+<h2 id="motivation"><a class="header" href="#motivation">Motivation</a></h2>
+<p>In designing <a href="https://github.com/cedar-policy/rfcs/blob/main/text/0024-schema-syntax.md">RFC24</a> we found that we needed to disambiguate user defined identifiers from built-in primitive and extension types.
+We accomplished this by reserving only the <code>__cedar</code> namespace inside of schema,
+but we anticipate that we may need more reserved namespaces in more contexts in the future.</p>
+<h2 id="detailed-design"><a class="header" href="#detailed-design">Detailed design</a></h2>
+<p>We will update the <a href="https://docs.cedarpolicy.com/policies/syntax-grammar.html#grammar-path">namespace grammar</a> to the following to exclude namespaces and identifiers starting with <code>__cedar</code>.</p>
+<pre><code>Path ::= IDENT {'::' TRAILING_NAMESPACE_IDENT}
+IDENT ::= INNER_IDENT - '__cedar'
+TRAILING_NAMESPACE_IDENT ::= ['_''a'-'z''A'-'Z']['_''a'-'z''A'-'Z''0'-'9']* - RESERVED
+RESERVED ::= 'true' | 'false' | 'if' | 'then' | 'else' | 'in' | 'like' | 'has'
+</code></pre>
+<p>This primarily applies to entity types names.
+In the case where an entity type isn't qualified with a namespace, the leading identifier is just the entity type, so we would forbid an unqualified type <code>__cedar</code>.
+It also applies anywhere else namespaces may appear, including the top-level <code>namespace</code> element in a schema file, qualified references to common types in a schema file, and extension function names in policies.</p>
+<p>It also applies where a standalone identifier is expected.
+For example, an entity attribute could not be <code>__cedar</code>.
+Reserving this single attribute is not own it's own particularly useful, but we may later extend the attribute grammar to accept namespace paths.</p>
+<h2 id="drawbacks"><a class="header" href="#drawbacks">Drawbacks</a></h2>
+<p>This is a significant breaking change.
+Anyone using the <code>__cedar</code> namespace will need to update their policies, schema, and entity data to use an unreserved namespace.
+The nature of this breaking change fortunately allows for migration away from reserved namespaces before the change is released,
+and the break will manifest immediately on attempting to parse an affected policy, schema, or entity.</p>
+<h2 id="alternatives"><a class="header" href="#alternatives">Alternatives</a></h2>
+<h3 id="a-larger-breaking-change"><a class="header" href="#a-larger-breaking-change">A larger breaking change</a></h3>
+<p>We could make a larger breaking change by reserving identifiers starting with <code>__</code> instead of just <code>__cedar</code>.
+For example, we would additional forbid referencing an entity <code>__tiny_todo::User</code>.</p>
+<p>We don't currently see an immediate need for this more aggressive change, and it increases the likelihood a current user will be affected.
+We may also find that consumers of Cedar who expose the policy language to their users want to reserve namespaces for their own use.
+They could of course choose a namespace with any leading characters, but they may prefer the uniformity between <code>__cedar::Long</code> and, for example, <code>__tiny_todo</code>.</p>
+<h3 id="no-breaking-change"><a class="header" href="#no-breaking-change">No breaking change</a></h3>
+<p>We can avoid a breaking change to Cedar by updating the Grammar to allow for a new identifier that is currently invalid, and then reserve that identifier.
+For example, we could reserve <code>$cedar</code> or <code>cedar$</code> (other options for characters include <code>%</code> or <code>!</code>).
+It would would be an error to use this identifier in any way that isn't explicitly permitted by the Cedar spec.</p>
+<p>Taking this option would require an update to the schema grammar proposed in <a href="https://github.com/cedar-policy/rfcs/blob/main/text/0024-schema-syntax.md">RFC24</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="0048-schema-annotations.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="0053-enum-entities.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="0048-schema-annotations.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="0053-enum-entities.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

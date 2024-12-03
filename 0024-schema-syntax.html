@@ -1,0 +1,735 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>0024-schema-syntax - Cedar RFC Book</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Cedar RFC Book</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="cedar-schema-syntax"><a class="header" href="#cedar-schema-syntax">Cedar Schema Syntax</a></h1>
+<h2 id="related-issues-and-prs"><a class="header" href="#related-issues-and-prs">Related issues and PRs</a></h2>
+<ul>
+<li>Reference Issues:</li>
+<li>Implementation PR(s): <a href="https://github.com/cedar-policy/cedar/pull/347">cedar#347</a> (cancelled), <a href="https://github.com/cedar-policy/cedar/pull/557">cedar#557</a> (merged)</li>
+</ul>
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li>Started: 2023-07-24</li>
+<li>Accepted: 2023-10-02</li>
+<li>Landed: 2024-02-19 on <code>main</code> (<a href="https://github.com/cedar-policy/cedar/pull/557">#557</a>)</li>
+<li>Released: 2024-03-08 in <code>cedar-policy</code> v3.1.0</li>
+</ul>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>This document proposes a custom syntax for Cedar schemas. The syntax was developed with the following goals in mind:</p>
+<ul>
+<li>Use the same concepts in both the JSON-based and custom syntax, allowing them to be naturally inter-converted</li>
+<li>Reuse Cedar policy syntax as much as possible, to help with intuition</li>
+<li>When no Cedar policy syntax analogue exists, leverage ideas from other programming languages that favor readability</li>
+<li>Use as few syntactic concepts as possible; similar ideas in the schema should look similar syntactically</li>
+<li>Support converting back and forth between the JSON-based schema without losing information</li>
+</ul>
+<p>This is <em>not</em> a proposal to <em>replace</em> the JSON-based syntax; the aim is to provide an additional syntax that better satisfies the goals above. The JSON syntax is appropriate in many circumstances, such as when constructing schemas systematically. Adopting this proposal would put schemas on the same footing as Cedar policies, which have a custom and a JSON syntax.</p>
+<h2 id="basic-example"><a class="header" href="#basic-example">Basic example</a></h2>
+<p>Here is the proposed syntax for the <a href="https://github.com/cedar-policy/cedar-examples/blob/main/tinytodo/tinytodo.cedarschema.json">TinyTodo schema</a>, whose auto-formatted JSON version is 160 lines long.</p>
+<pre><code>entity Application;
+entity User in [Team,Application] { name: String };
+entity Team in [Team,Application];
+entity List in [Application] {
+    owner: User,
+    name: String,
+    readers: Team,
+    editors: Team,
+    tasks: Set&lt;{name: String, id: Long, state: String}&gt;
+};
+
+action CreateList, GetLists
+    appliesTo { principal: [User], resource: [Application] };
+
+action GetList, UpdateList, DeleteList, CreateTask, UpdateTask, DeleteTask, EditShares
+    appliesTo { principal: [User], resource:[List] };
+</code></pre>
+<h2 id="motivation"><a class="header" href="#motivation">Motivation</a></h2>
+<p>Cedar schemas for non-toy applications are hard to read and write. The root cause of the difficulty is the use of JSON:</p>
+<ul>
+<li>JSON has low information density. For three applications we’ve modeled — <a href="https://github.com/cedar-policy/cedar-examples/blob/main/tinytodo/tinytodo.cedarschema.json">TinyTodo</a>, <a href="https://github.com/cedar-policy/cedar-examples/blob/main/cedar-example-use-cases/document_cloud/schema.json">Document Cloud</a>, and <a href="https://github.com/cedar-policy/cedar-examples/blob/main/cedar-example-use-cases/github_example/schema.json">GitHub</a> — schemas span 4-5 pages.</li>
+<li>JSON does not support comments. This means that any design intent for a schema cannot be expressed inline.</li>
+</ul>
+<p>We believe that a custom syntax for Cedar schemas can help. It can be more information-dense, support comments, and leverage familiar syntactic constructs. We think customers will be happier with a custom syntax: we regularly hear favorable reviews of Cedar's custom policy syntax, as compared to a JSON-based syntax.</p>
+<h2 id="detailed-design"><a class="header" href="#detailed-design">Detailed Design</a></h2>
+<p>In what follows we first present the syntax by example. A full grammar is given at the end.</p>
+<h3 id="comments"><a class="header" href="#comments">Comments</a></h3>
+<p>Cedar schemas can use line-ending comments in the same style as Cedar, e.g., <code>// this is a comment</code>.</p>
+<h3 id="namespace-format"><a class="header" href="#namespace-format">Namespace format</a></h3>
+<pre><code>namespace My::Namespace {
+  ...
+}
+</code></pre>
+<p>A Schema can have zero or more namespace declarations. The contents of each (<code>...</code> above) comprise entity, action, and common-type declarations, all of which are unordered; i.e., they are all allowed to mutually refer to one another (but see discussion on common types below). The recommended style is to put entity declarations first, followed by action declarations, with common type declarations interspersed as needed. Entity, action, and common types referenced in the same namespace in which they are defined need not be prefixed by that namespace.</p>
+<p>Entity, action, and common-type declarations can appear on their own, outside of any namespace; in that case they are implicitly within the empty namespace.</p>
+<h3 id="entity-declarations"><a class="header" href="#entity-declarations">Entity declarations</a></h3>
+<p>Here is an example illustrating the entity declaration syntax.</p>
+<pre><code>entity User in [Group] {
+    personalGroup: Group,
+    delegate?: User,
+    blocked: Set&lt;User&gt;,
+};
+entity Document {
+    owner: User,
+    isPrivate: Boolean,
+    publicAccess: String,
+    viewACL: DocumentShare,
+    modifyACL: DocumentShare,
+    manageACL: DocumentShare
+};
+entity DocumentShare;
+entity Public in [DocumentShare];
+</code></pre>
+<p>The first declaration indicates that <code>User</code> is an entity type, can be a member of the <code>Group</code> type, and has two attributes: <code>personalGroup</code> with entity type <code>Group</code>, and <code>blocked</code> with type <code>Set&lt;User&gt;</code>.</p>
+<p>To allow syntactic parity with common <code>type</code> declarations, discussed below, we can optionally add <code>=</code> just before the <code>{ ... }</code> defining an entity's attributes, e.g., <code>entity Dog = { name: String }</code> rather than <code>entity Dog { name: String }</code>. Allowing <code>=</code> also supports using a common type name as the entity's shape, and also allows a future extension in which an entity's shape is a type other than a record.</p>
+<p>Entity declarations may or may not have the <code>in ...</code> component, and they may or may not have attributes. A singleton list can be expressed without brackets, e.g., <code>entity User in Group = ...</code> Optional attributes are specified in the style of Typescript, with a <code>?</code> after their name. The last element of an the attribute list can optionally include a comma.</p>
+<p>Entity types that share a definition can be declared together. For example, the following declares two entity types <code>User</code> and <code>Team</code>, both of which can be members of <code>Team</code> and both of which have a <code>name</code> attribute.</p>
+<pre><code>entity User, Team in [Team] { name: String };
+</code></pre>
+<p>Since the JSON-based format does not support groups, this creates a challenge for back-and-forth translation. Our suggested solution is to add an optional <code>groupid</code> attribute to an entity declaration in the JSON. Those entities that are in the same group will be put together when translating to the custom syntax (after confirming that they indeed have the same type), and when translating to JSON such a group ID will be automatically generated.</p>
+<h3 id="action-declarations"><a class="header" href="#action-declarations">Action declarations</a></h3>
+<p>Here is an example illustrating the action declaration syntax.</p>
+<pre><code>action ReadActions;
+action WriteActions;
+action CreateDocument
+    appliesTo { principal: [User], resource: [Drive] };
+action DeleteDocument in [WriteActions]
+    appliesTo { principal: [User], resource: [Document] };
+action ViewDocument in [ReadActions] appliesTo {
+    principal: [User,Public],
+    resource: Document,
+    context: {
+        network: ipaddr,
+        browser: String
+    }
+};
+</code></pre>
+<p>A declared action indicates either none, one, or both of the following:</p>
+<ol>
+<li>What action groups it is a member of, using <code>in</code></li>
+<li>What principal, resource, and context types it may be coupled with in a request (if any), using <code>appliesTo</code></li>
+</ol>
+<p>Specifying <code>[]</code> for the <code>in</code> component is equivalent to omitting <code>in</code> entirely. An action that has no <code>appliesTo</code> component essentially names an action group: having no possible principal and/or resource types means there’s no way to submit a legal request with the action.</p>
+<p>The <code>appliesTo</code> specificiation uses record syntax, where the "attributes" of the record may be any combination of <code>principal</code>, <code>resource</code>, and <code>context</code>, with the following constraints.</p>
+<ul>
+<li>If <code>principal</code> and/or <code>resource</code> is given, the accompanying type must be either
+<ul>
+<li>a single entity type, or</li>
+<li>a <em>non-empty</em> list of entity types</li>
+</ul>
+</li>
+<li>If a <code>principal</code> or <code>resource</code> element is not given, that means that this request component is <em>unspecified</em>, i.e., corresponding to the <code>None</code> option in the <code>principal</code> or <code>resource</code> component of a <a href="https://docs.rs/cedar-policy/2.4.0/cedar_policy/struct.Request.html"><code>Request</code></a>.</li>
+<li>If <code>context</code> is given, the accompanying type must be a record type. If it is not given, the type <code>{}</code> is assumed.</li>
+<li>At least one of <code>principal</code>, <code>resource</code>, or <code>context</code> must be included if <code>appliesTo</code> is present; i.e., writing <code>appliesTo { }</code> is not allowed.</li>
+</ul>
+<p>Here are two additional examples that follow these rules:</p>
+<pre><code>action ViewDocument in ReadActions appliesTo {
+    resource: Document,
+    context: {}
+};
+action Ping appliesTo {
+    context: {
+        source: ipaddr,
+        dest: ipaddr
+    }
+};
+</code></pre>
+<p>Since actions are entities, action names are entity IDs, which can be arbitrary strings. Thus we admit the following more general syntax as well.</p>
+<pre><code>action "Delete Document $$" in ["Write Actions"] appliesTo {
+    principal: [User],
+    resource: [Document]
+};
+</code></pre>
+<p>We anticipate future support for attributes as part of action entities. If/when they are supported, we can specify action attributes after the <code>appliesTo</code> part as an inline record using Cedar syntax following an <code>attributes</code> keyword. For example, here’s an extension of <code>ViewDocument</code> with action attributes.</p>
+<pre><code>action ViewDocument in [ReadActions]
+  appliesTo {
+    principal: [User,Public],
+    resource: Document,
+    context: {
+        network: ipaddr,
+        browser: String
+    }
+  }
+  attributes {
+    version: 1,
+    group: "meta"
+  };
+</code></pre>
+<p>As with <code>entity</code> declarations, since the JSON-based format does not support groups, we can add an optional <code>groupid</code> attribute to an action declaration in the JSON. Those actions that are in the same group will be put together when translating to the custom syntax (after confirming that they indeed have the same type), and when translating to JSON such a group ID will be automatically generated.</p>
+<h3 id="common-types"><a class="header" href="#common-types">Common types</a></h3>
+<p>You can define names for types (as in Typescript, OCaml, Haskell, and many other languages) and then use them in <code>action</code> and <code>entity</code> declarations. Here is an example:</p>
+<pre><code>type authcontext = {
+    ip: ipaddr,
+    is_authenticated: Boolean,
+    timestamp: Long
+};
+entity Ticket {
+  who: String,
+  operation: Long,
+  request: authcontext
+};
+action view appliesTo { context: authcontext };
+action upload appliesTo { context: authcontext };
+</code></pre>
+<p>Note the use of <code>=</code> for <code>type</code> declarations, but the lack of (required) <code>=</code> for <code>entity</code> declarations; the <code>=</code> is needed because the definining type may not be a record, e.g., <code>type time = Long</code>.</p>
+<p>As with <code>entity</code> and <code>action</code> declarations, the name implicitly includes the surrounding namespace as a prefix.</p>
+<p>While common types can be declared anywhere within a namespace and safely referenced by entity and action declarations, they cannot refer to one another, to avoid introducing definitional cycles. (To allow mutual reference, we could make declaration order matter: <code>entity</code>, <code>action</code>, and other <code>type</code> declarations cannot refer to a common type before it is defined.)</p>
+<p><em>Much later note, May 2024: In the fullness of time we relaxed the above restriction and allowed common types to refer to one another, as long as there are no definitional cycles. See <a href="https://github.com/cedar-policy/cedar/pull/766">cedar#766</a>.</em></p>
+<h3 id="disambiguating-types-in-custom-syntax"><a class="header" href="#disambiguating-types-in-custom-syntax">Disambiguating Types in Custom Syntax</a></h3>
+<p>Cedar has four kinds of type name:</p>
+<ol>
+<li>Primitive types, e.g., <code>Long</code>, <code>String</code>, etc.</li>
+<li>Extension types, currently just <code>ipaddr</code> and <code>decimal</code></li>
+<li>Entity types</li>
+<li>Common types</li>
+</ol>
+<p>The first two are built in, and could potentially change in the future. The last two are schema-declarable; they have an associated namespace prefix, but references within the defining namespace can drop the prefix.</p>
+<p>In the current JSON syntax, common types may not overlap with primitive types; e.g., declaring a common type <code>Long</code> is disallowed. However, common types are permitted to overlap with extension types; e.g., declaring common type <code>ipaddr</code> is allowed. This works in the JSON because specifying an extension type requires an explicit <code>"type"</code> designator, as in the following:</p>
+<pre><code>"addr": {
+    "ip": { "type": "Extension", "name": "ipaddr" },
+}
+</code></pre>
+<p>If we <em>also</em> had defined a common type <code>ipaddr</code> we would reference it by writing</p>
+<pre><code>"addr": {
+    "myip": { "type": "ipaddr" },
+}
+</code></pre>
+<p>Common types may also overlap with entity types, for similar reasons: To reference an entity type you must write <code>{ "type": "Entity", "name": "Foo" }</code> while to reference a common type you'd just write <code>{ "type": "Foo" }</code>.</p>
+<p>The custom syntax does not require such designators, for readability, so we need a way to <strong>disambiguate type name references</strong> when necessary.</p>
+<p>When two different kinds of type definitions are in separate namespaces, we rely on the namespace resolution rules to disambiguate. For example, suppose we defined the following schema:</p>
+<pre><code>type email_address = String; // (1)
+namespace Foo {
+    entity email_address { addr: String }; // (2)
+    entity User { email: email_address }; // (3)
+}
+</code></pre>
+<p>Here, in the definition of <code>User</code>, the unqualified type <code>email_address</code> at (3) resolves to the <em>entity</em> definition at (2), because it is in the closest enclosing scope.</p>
+<p>When two different kinds of type definitions are in the <em>same</em> namespace, we propose the following five rules:</p>
+<ol>
+<li>Issue a warning (for both syntaxes) when a schema defines the same typename twice (within a namespace)</li>
+<li>Disallow overlap of extension and primitive type names</li>
+<li>Resolve name references in a priority order</li>
+<li>Reserve <code>__cedar</code> as a namespace to disambiguate extension/primitive types from others</li>
+<li>Handle entity/common typename overlaps in translation</li>
+</ol>
+<p>These rules aim to address several (additional) tenets</p>
+<ul>
+<li>Conflicting type names are an exception to be discouraged, rather than a norm, for readability and clarity</li>
+<li>Schemas should not break when new extension types are added to Cedar</li>
+<li>Backward-incompatible changes should be minimized</li>
+</ul>
+<h4 id="rule-1-issue-a-warning-for-both-syntaxes-when-a-schema-defines-the-same-typename-twice"><a class="header" href="#rule-1-issue-a-warning-for-both-syntaxes-when-a-schema-defines-the-same-typename-twice">Rule 1: Issue a warning (for both syntaxes) when a schema defines the same typename twice</a></h4>
+<p>Defining an entity type with the same name as a primitive or extension type, or an entity and common type with the same name (within the same namespace), is unlikely to be a good idea. Though they can be technically disambiguated in the JSON syntax, the potential for confusion is nontrivial. None of the rules that follow need to be understood, and conversion to/from JSON and custom syntax is assured, if defined types are all kept distinct.</p>
+<h4 id="rule-2-disallow-overlap-of-extension-and-primitive-type-names"><a class="header" href="#rule-2-disallow-overlap-of-extension-and-primitive-type-names">Rule 2: Disallow overlap of extension and primitive type names</a></h4>
+<p>Right now, all primitive types have different names than extension types. We propose that it should always be that way.  Though the flexibility is there in today’s JSON schema to allow overlap, we see no good reason to allow it. Because we are currently the sole purveyor of extension types, this rule is easy to implement.</p>
+<h4 id="rule-3-resolve-name-references-in-a-priority-order"><a class="header" href="#rule-3-resolve-name-references-in-a-priority-order">Rule 3: Resolve name references in a priority order</a></h4>
+<p>When the schema references a type name (without a namespace prefix), it should resolve in the following order:</p>
+<ol>
+<li>common type</li>
+<li>entity type</li>
+<li>primitive</li>
+<li>extension type</li>
+</ol>
+<p>For example, suppose we declared a common type <code>type ipaddr = Long;</code> If the schema later referred to <code>ipaddr</code>, then that reference would be to this common type definition, not the extension type, since the common type is higher in the order. This ordering ensures that <strong>future-added extension types will not break existing schemas</strong>. For example, if we added a future extension type <code>date</code>, then schemas that define an entity or common type of the same name would have the same semantics as before: they would refer to the schema-defined type, not the new extension type.</p>
+<p>In tabular form, this priority order is depicted below. We write n/a for the case that the two kinds of type can never share the same name (due to the status quo and rule 2).</p>
+<p>|	|common	|entity	|primitive	|extension	|
+|---	|---	|---	|---	|---	|
+|common	|	|	|	|	|
+|entity	|common	|	|	|	|
+|primitive	|n/a	|entity	|	|	|
+|extension	|common	|entity	|n/a	|	|</p>
+<p>The next two rules consider how to disambiguate conflicting types.</p>
+<h4 id="rule-4-reserve-__cedar-as-a-namespace-to-disambiguate-extensionprimitive-types-from-others"><a class="header" href="#rule-4-reserve-__cedar-as-a-namespace-to-disambiguate-extensionprimitive-types-from-others">Rule 4: Reserve <code>__cedar</code> as a namespace to disambiguate extension/primitive types from others</a></h4>
+<p>If a schema defines a common or entity type that overlaps with an extension type, there is no way to refer to extension type — the common or entity type always take precedence. This is particularly problematic if a new extension type overlaps with an existing definition, and an update to the schema might wish to use both.</p>
+<p>To rectify this problem, we propose reserving the namespace <code>__cedar</code> and allowing it to be used as a prefix for both primitive and extension types. This way, an entity type <code>ipaddr</code> can be referred to directly, and the extension type <code>ipaddr</code> can be referred to as <code>__cedar::ipaddr</code>. Likewise, this allows one to (say) define an entity type <code>String</code> that can be be referenced distinctly from <code>__cedar::String</code> (though this practice should be discouraged!).</p>
+<h4 id="rule-5-handle-entitycommon-typename-overlaps-in-translation"><a class="header" href="#rule-5-handle-entitycommon-typename-overlaps-in-translation">Rule 5: Handle entity/common typename overlaps in translation</a></h4>
+<p>If a schema defines an entity type and a common type with the same name, the references to that name will resolve to the common type, and there will be no way to reference the entity type in the custom syntax. Per rule 1, users will be warned of this.</p>
+<p>Custom syntax users can rectify the situation by changing either the common type or entity type to a different name (or placing them in different namespaces). JSON syntax users can refer to both types distinctly, but will be warned that translation to the custom syntax will not be possible without changing the name. Translation tools can easily make this name change automatically.</p>
+<p>Note that translation from JSON to custom syntax is only problematic when a schema defines both a common and entity type of the same name. Translation tools can easily address this issue by renaming the common type (and offering to change the type name in the original JSON)</p>
+<p>Evaluating these rules against our added tenets above, we can see:</p>
+<ul>
+<li>Conflicting type names are discouraged by issuing a warning when there is overlap</li>
+<li>Due to the choice in priority order, schemas will not break when new extension types are added</li>
+<li>Only rule 4 (introducing the <code>__cedar</code> reserved namespace) is backward incompatible, and it is very unlikely to affect existing schemas.</li>
+</ul>
+<h4 id="rejected-alternative-designs-for-disambiguation"><a class="header" href="#rejected-alternative-designs-for-disambiguation">Rejected alternative designs for disambiguation</a></h4>
+<p>One alternative design we considered was to use prefixes on typename references to indicate the kind of type, e.g., extension types could be optionally prefixed with <code>+</code>, e.g., <code>+ipaddr</code> and <code>+decimal</code>, and entity types could be optionally prefixed with <code>&amp;</code>, e.g., <code>&amp;User</code> and <code>&amp;My::Namespace::List</code>. However, we rejected this design because it would be unfamiliar to users (especially the use of <code>+</code>), and doesn't discourage the use of overlapping type names.</p>
+<p>Another alternative we considered was to forbid type-name overlaps entirely. However, rejected this design because it is strongly backward-incompatible, and also because it could lead to surprise if a future definition of an extension type happened to match a common or entity type in use in an existing schema.</p>
+<h3 id="mockup-document-cloud"><a class="header" href="#mockup-document-cloud">Mockup: Document Cloud</a></h3>
+<p>Here is a version of the <a href="https://github.com/cedar-policy/cedar-examples/blob/main/cedar-example-use-cases/document_cloud/schema.json">Document Cloud</a> schema.</p>
+<pre><code>namespace DocCloud {
+    entity User in [Group] {
+        personalGroup: Group,
+        blocked: Set&lt;User&gt;
+    };
+    entity Group in [DocumentShare] { 
+        owner: User 
+    };
+    entity Document {
+        owner: User,
+        isPrivate: Boolean,
+        publicAccess: String,
+        viewACL: DocumentShare,
+        modifyACL: DocumentShare,
+        manageACL: DocumentShare
+    };
+    entity DocumentShare;
+    entity Public in [DocumentShare];
+    entity Drive;
+
+    action CreateDocument, CreateGroup 
+        appliesTo { principal: [User], resource: [Drive] };
+    action ViewDocument 
+        appliesTo { principal: [User,Public], resource: [Document] };
+    action DeleteDocument, ModifyDocument, EditIsPrivate, AddToShareACL, EditPublicAccess 
+        appliesTo { principal: [User], resource: [Document] };
+    action ModifyGroup, DeleteGroup 
+        appliesTo { principal: [User], resource: [Group] };
+}
+</code></pre>
+<h3 id="mockup-github-model"><a class="header" href="#mockup-github-model">Mockup: GitHub Model</a></h3>
+<p>Here is a version of the <a href="https://github.com/cedar-policy/cedar-examples/blob/main/cedar-example-use-cases/github_example/schema.json">GitHub</a> schema.</p>
+<pre><code>namespace GitHub {
+    entity User in [UserGroup,Team];
+    entity UserGroup in [UserGroup];
+    entity Repository {
+        readers: UserGroup,
+        triagers: UserGroup,
+        writers: UserGroup,
+        maintainers: UserGroup,
+        admins: UserGroup   
+    };
+    entity Issue {
+        repo: Repository,
+        reporter: User
+    };
+    entity Org {
+        members: UserGroup,
+        owners: UserGroup,
+        memberOfTypes: UserGroup
+    };
+    action pull, fork, push, add_reader, add_triager, add_writer, add_maintainer, add_admin 
+        appliesTo { principal: [User], resource: [Repository] };
+    action delete_issue, edit_issue, assign_issue 
+        appliesTo { principal: [User], resource: [Issue] };
+}
+</code></pre>
+<h3 id="grammar"><a class="header" href="#grammar">Grammar</a></h3>
+<p>Here is a grammar for the proposed schema syntax.</p>
+<p>The grammar applies the following the conventions. Capitalized words stand for grammar productions, and lexical tokens are given in all-caps. When productions or tokens match those in the Cedar policy grammar, we use the same names (e.g., <code>IDENT</code> and <code>Path</code>).</p>
+<p>For grammar productions it uses <code>|</code> for alternatives, <code>[]</code> for optional productions, <code>()</code> for grouping, and <code>{}</code> for repetition of a form zero or more times.</p>
+<p>Tokens are defined using regular expressions, where <code>[]</code> stands for character ranges; <code>|</code> stands for alternation; <code>*</code> , <code>+</code> , and <code>?</code> stand for zero or more, one or more, and zero or one occurrences, respectively; <code>~</code> stands for complement; and <code>-</code> stands for difference. The grammar ignores whitespace and comments.</p>
+<pre><code>Schema    := {Namespace}
+Namespace := ('namespace' Path '{' {Decl} '}') | {Decl}
+Decl      := Entity | Action | TypeDecl
+Entity    := 'entity' Idents ['in' EntOrTyps] [['='] RecType] ';'
+Action    := 'action' Names ['in' (QualName | '[' [QualNames] ']')] [AppliesTo] [ActAttrs]';'
+TypeDecl  := 'type' IDENT '=' Type ';'
+Type      := PRIMTYPE | Path | SetType | RecType
+EntType   := Path
+SetType   := 'Set' '&lt;' Type '&gt;'
+RecType   := '{' [AttrDecls] '}'
+AttrDecls := Name ['?'] ':' Type [',' | ',' AttrDecls]
+AppliesTo := 'appliesTo' '{' AppDecls '}'
+ActAttrs  := 'attributes' '{' AttrDecls '}'
+AppDecls  := ('principal' | 'resource') ':' EntOrTyps [',' | ',' AppDecls]
+           | 'context' ':' RecType [',' | ',' AppDecls]
+QualName      := Name | Path '::' STR
+QualNames := QualName {',' QualName }
+Path      := IDENT {'::' IDENT}
+EntTypes  := Path {',' Path}
+EntOrTyps := EntType | '[' [EntTypes] ']'
+Name      := IDENT | STR
+Names     := Name {',' Name}
+Idents    := IDENT {',' IDENT}
+
+IDENT     := ['_''a'-'z''A'-'Z']['_''a'-'z''A'-'Z''0'-'9']* - PRIMTYPE
+STR       := Fully-escaped Unicode surrounded by '"'s
+PRIMTYPE  := 'Long' | 'String' | 'Bool'
+WHITESPC  := Unicode whitespace
+COMMENT   := '//' ~NEWLINE* NEWLINE
+</code></pre>
+<h2 id="drawbacks"><a class="header" href="#drawbacks">Drawbacks</a></h2>
+<p>There are several reasons not to develop a custom syntax:</p>
+<h3 id="multiple-formats-can-raise-cognitive-burden"><a class="header" href="#multiple-formats-can-raise-cognitive-burden">Multiple formats can raise cognitive burden</a></h3>
+<p>Adding another schema format raises the bar for what customers need to know. They may ignore one format at first, but eventually they may need to learn both. For example, if one team uses the JSON format and another uses the custom format, but then the teams merge, they will each end up having to read/update the other's format. They may also fight about which format to move to.</p>
+<p>Mitigating this problem is that it's easy and predictable to convert between the two formats, since the syntactic concepts line up very closely. The features you lose when converting from the new format to the JSON one would be 1/ any comments, and 2/ any use of intermingling of <code>action</code>, <code>entity</code>, and <code>type</code> declarations, since they must all be in their own sections in the JSON. Otherwise the features line up very closely and the only difference is syntax. We would expect to write conversion tools as part of implementing the new syntax (which are easily achieved by parsing in the new format and pretty-printing in JSON).</p>
+<p>Another mitigating point is that it's early days for Cedar, and we can promote the custom syntax as the preferred choice. JSON should be used when writing tooling to auto-author or manipulate schemas, e.g., as part of a GUI. We have a <a href="https://docs.cedarpolicy.com/json-format.html">JSON syntax for Cedar policies</a> for similar reasons, but it's the custom syntax that is front and center.</p>
+<h3 id="requirement-of-good-tooling"><a class="header" href="#requirement-of-good-tooling">Requirement of good tooling</a></h3>
+<p>As a practical matter, having a custom schema syntax will require that we develop high-quality tools to help authors write correct schemas.</p>
+<p>Parse error messages need to be of good quality, and report common issues such as missing curly braces, missing semi-colons, incorrect keywords, etc. A formatting tool can help ensure standardized presentation. An IDE plugin can put these things together to provide interactive feedback. For the JSON syntax, IDE plugins already exist to flag parse errors and to format documents uniformly.</p>
+<p>However, JSON plugins do not understand the semantics of Cedar schemas, so they cannot provide hints about semantic errors (e.g., that setting <code>principalTypes</code> to <code>[]</code> for an <code>action</code> effectively means the <code>action</code> cannot be used in a request). We could develop a linting tool that flags these issues, and it could be applied to both syntaxes.</p>
+<p>Note that the problem of matching up curly braces in JSON-formatted schemas is more acute than in the custom syntax, since it's common to have deep nesting levels where matching is hard to eyeball. For example, in the <code>TinyTodo</code> JSON schema, we have up to seven levels of direct nesting of curly braces, whereas the custom syntax has only three, and these levels are more visually isolated because of the other syntax in between them.</p>
+<h3 id="greater-implementation-cost"><a class="header" href="#greater-implementation-cost">Greater implementation cost</a></h3>
+<p>Supporting a new syntax is an extra implementation cost, including the new tools mentioned above, now and going forward. More code/tools means more potential for bugs.</p>
+<p>Mitigating this problem: The Rust internals already parse the JSON schema to a data structure, so adding a new format only involves adding a parser to this data structure and not, for example, making changes to the validator. We can use property-based testing to ensure that both formats are interconvertible, and correctly round-trip, i.e., that <em>parse(pretty-print(AST)) == AST</em>.</p>
+<h2 id="alternatives"><a class="header" href="#alternatives">Alternatives</a></h2>
+<p>One alternative would be to <em>replace</em> the current JSON-based sytnax with the one in this proposal. This proposal would avoid the "cognitive burden" drawback mentioned above, but would be a disruptive, backward-incompatible change, and would lose the JSON format's benefits of existing tooling and easier programmatic schema construction.</p>
+<p>Another alternative would be to adopt a <a href="https://en.wikipedia.org/wiki/YAML">Yaml</a>-based syntax. This approach would meet our goals of greater information density and support for comments, and it would come with some existing tooling (such as IDE extensions). A downside of Yaml is that it provides <em>more</em> than we need, with a lack of conciseness leading to confusing. We could make our own parser for a subset of Yaml we wish to support for schemas, but that may lead to a confusing user experience. Yaml's indentation-sensitive parsing also means that an indentation mistake will be silently accepted, leading to a confusing user experience. Our custom syntax is whitespace-insensitive, and having total control over the grammar means better context for error messages.</p>
+<h2 id="appendix-a---appliesto-conversion-table"><a class="header" href="#appendix-a---appliesto-conversion-table">Appendix A - AppliesTo Conversion Table</a></h2>
+<p>The relationship of <code>appliesTo</code> clauses between JSON schemas and this new syntax are non-obvious when unspecified entities or actions with no targets are involved.
+This appendix details a conversion table for the purposes of specification.</p>
+<h3 id="both-unspecified"><a class="header" href="#both-unspecified">Both Unspecified</a></h3>
+<p>The following JSON schemas all set <code>principal</code> and <code>resource</code> to be <em>unspecified</em>, and leave the <code>context</code> as the empty record. They all map to the same schema</p>
+<pre><code>"actions" : {
+  "read" : {
+   }
+}
+</code></pre>
+<pre><code>"actions" : {
+  "read" : {
+    "appliesTo" : null
+  }
+}
+</code></pre>
+<pre><code>"actions" : {
+  "read" : {
+    "appliesTo" : {
+    }
+  }
+}
+</code></pre>
+<p>This means that both <code>principal</code> and <code>resource</code> are <em>unspecified</em> and that <code>context</code> is the empty record. This becomes:</p>
+<pre><code>action read { 
+  context : {}
+};
+</code></pre>
+<p>We must include the <code>context : {}</code> as <code>action A {};</code> is not valid in the grammar.</p>
+<h3 id="missing-bothyes-context"><a class="header" href="#missing-bothyes-context">Missing Both/Yes Context</a></h3>
+<pre><code>"actions" : {
+  "read" : {
+    "appliesTo" : {
+      "context" : A
+    }
+  }
+}
+</code></pre>
+<p>This means that both <code>principal</code> and <code>resource</code> are <em>unspecified</em> and that <code>context</code> has type A. This becomes:</p>
+<pre><code>action read appliesTo {
+  context : A
+};
+</code></pre>
+<h3 id="missing-principaltypes-no-context"><a class="header" href="#missing-principaltypes-no-context">Missing <code>principalTypes</code> /No Context</a></h3>
+<pre><code>"actions" : {
+  "read" : {
+    "appliesTo" : {
+      "resourceTypes" : [A]
+    }
+ }
+}
+</code></pre>
+<p>This means that <code>principal</code> is <em>unspecified</em>, but <code>resource</code> is specified. <code>context</code> is the empty record. Becomes: (Including the empty context would also be valid)</p>
+<pre><code>action read {
+  resource : [A]
+};
+</code></pre>
+<h3 id="missing-principaltypes-yes-context"><a class="header" href="#missing-principaltypes-yes-context">Missing <code>principalTypes</code> /Yes Context</a></h3>
+<pre><code>"actions" : {
+  "read" : {
+    "appliesTo" : {
+      "resourceTypes" : [A]
+      "context" : B
+    }
+ }
+}
+</code></pre>
+<p>This means that <code>principal</code> is <em>unspecified</em>, but <code>resource</code> is specified. <code>context</code> has type <code>B</code>. Becomes:</p>
+<pre><code>action read {
+  resource : [A],
+  context : B
+};
+</code></pre>
+<h3 id="missing-resourcetypesno-context"><a class="header" href="#missing-resourcetypesno-context">Missing <code>resourceTypes</code>/No Context</a></h3>
+<pre><code>"actions" : {
+  "read" : {
+    "appliesTo" : {
+      "principalTypes" : [A]
+    }
+  }
+}
+</code></pre>
+<p>This means that <code>resource</code> is <em>unspecified</em>, but <code>principal</code> is specified. <code>context</code> is the empty record. Becomes: (Including the empty context would also be valid).</p>
+<pre><code>action read appliesTo {
+  principal: [A]
+}
+</code></pre>
+<h3 id="missing-resourcetypesyes-context"><a class="header" href="#missing-resourcetypesyes-context">Missing <code>resourceTypes</code>/Yes Context</a></h3>
+<pre><code>"actions" : {
+  "read" : {
+    "applieTo" : {
+      "principalTypes" : [A],
+      "context" : B
+    }
+  }
+}
+</code></pre>
+<p>This means that <code>resource</code> is <em>unspecified</em>, but <code>principal</code> is specified. <code>context</code> has type B. Becomes:</p>
+<pre><code>action read appliesTo {
+  principal: [A],
+  context: B
+};
+</code></pre>
+<h3 id="non-applicable-actions"><a class="header" href="#non-applicable-actions">Non-Applicable Actions</a></h3>
+<p>The following <em>all</em> collapse to the same schema object. They all involve action types which are not applicable. Specifying that you are applicable to some <code>principal</code> P and not applicable to any resources is equivalent to not being applicable to any principals or resources.</p>
+<pre><code>"actions" : {
+  "read" : {
+    "appliesTo" : {
+      "principalTypes" : [],
+      "resourceTypes" : []
+    }
+  }
+}
+</code></pre>
+<pre><code>"actions" : {
+  "read" : {
+    "appliesTo" : {
+      "principalTypes" : [],
+      "resourceTypes" : [A]
+    }
+  }
+}
+</code></pre>
+<pre><code>"actions" : {
+  "read" : {
+    "appliesTo" : {
+      "principalTypes" : [A],
+      "resourceTypes" : []
+    }
+  }
+}
+</code></pre>
+<pre><code>"actions" : {
+  "read" : {
+    "appliesTo" : {
+      "principalTypes" : [],
+      "resourceTypes" : [],
+      "context" : A
+    }
+  }
+}
+</code></pre>
+<pre><code>"actions" : {
+  "read" : {
+    "appliesTo" : {
+      "principalTypes" : [A],
+      "resourceTypes" : [],
+      "context" : B
+    }
+  }
+}
+</code></pre>
+<pre><code>"actions" : {
+  "read" : {
+    "appliesTo" : {
+      "principalTypes" : [],
+      "resourceTypes" : [A],
+      "context" : B
+    }
+  }
+}
+</code></pre>
+<p>All of the above map to the following:</p>
+<pre><code>action read;
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="0021-any-and-all-operators.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="0032-port-formalization-to-lean.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="0021-any-and-all-operators.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="0032-port-formalization-to-lean.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
